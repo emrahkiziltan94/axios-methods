@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 
 const Movie = (props) => {
-  const { addToFavorites } = props;
+  const { addToFavorites, deleteMovie } = props;
 
   const [movie, setMovie] = useState('');
 
   const { id } = useParams();
+  const { push } = useHistory();
 
   useEffect(() => {
     axios
@@ -62,6 +64,13 @@ const Movie = (props) => {
         >
           Edit
         </Link>
+        <button
+          onClick={() => deleteMovie(id)}
+          type="button"
+          className="bg-red-600"
+        >
+          Sil
+        </button>
       </div>
     </div>
   );

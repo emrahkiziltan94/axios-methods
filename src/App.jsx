@@ -12,10 +12,9 @@ import { AddMovieForm } from './components/AddMovieForm';
 
 const App = (props) => {
   const [movies, setMovies] = useState([]);
-  const [favMovies, setFavMovies] = useState([]);
-  const [darkMode, setDarkMode] = useLocalStorage('s11d3', true);
+  const [favoriteMovies, setFavoriteMovies] = useState([]);
   const history = useHistory();
-
+  const [darkMode, setDarkMode] = useLocalStorage('s11d3', true);
   useEffect(() => {
     axios
       .get('https://nextgen-project.onrender.com/api/s11d3/movies')
@@ -29,10 +28,10 @@ const App = (props) => {
 
   const deleteMovie = (id) => {
     axios
-      .delete('https://nextgen-project.onrender.com/api/s11d3/movies/' + id)
+      .delete(`https://nextgen-project.onrender.com/api/s11d3/movies/${id}`)
       .then((res) => {
         setMovies(res.data);
-        setFavMovies(favMovies.filter((movie) => movie.id != id));
+        setFavoriteMovies(favoriteMovies.filter((m) => m.id !== id));
         history.push('/movies');
       })
       .catch((err) => {
@@ -41,12 +40,9 @@ const App = (props) => {
   };
 
   const addToFavorites = (movie) => {
-    if (!favMovies.find((mov) => mov.id === movie.id)) {
-      setFavMovies([...favMovies, movie]);
+    if (!favoriteMovies.find((m) => m.id === movie.id)) {
+      setFavoriteMovies([...favoriteMovies, movie]);
     }
-  };
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
   };
 
   return (
@@ -63,7 +59,7 @@ const App = (props) => {
             className="sr-only peer"
             data-testid="darkMode-toggle"
             checked={darkMode}
-            onChange={toggleDarkMode}
+            onChange={() => setDarkMode(!darkMode)}
           />
           <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
           <span className="ms-3  font-medium text-gray-900 dark:text-gray-300">
@@ -74,7 +70,10 @@ const App = (props) => {
       <div className=" max-w-4xl mx-auto px-3 pb-4 ">
         <MovieHeader />
         <div className="flex flex-col sm:flex-row gap-4">
-          <FavoriteMovieList darkMode={darkMode} favoriteMovies={favMovies} />
+          <FavoriteMovieList
+            favoriteMovies={favoriteMovies}
+            darkMode={darkMode}
+          />
           <Switch>
             <Route path="/movies/edit/:id">
               <EditMovieForm setMovies={setMovies} />
@@ -88,6 +87,7 @@ const App = (props) => {
                 deleteMovie={deleteMovie}
               />
             </Route>
+
             <Route path="/movies">
               <MovieList movies={movies} />
             </Route>
